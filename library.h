@@ -99,7 +99,7 @@ int library :: operation(string d, string rt, string rn, string st, string mt, s
 			date = 0;
 			return 3;
 		}
-		if(date > lbooks.at(rnum).ped()){
+ 		if(date > lbooks.at(rnum).ped()){
 			undergraduates.at(mnum).set(mn,date - lbooks.at(rnum).ped() + date);
 			date = undergraduates.at(mnum).ppenalty();
 			lbooks.at(rnum).set(rn,"R",0,0);
