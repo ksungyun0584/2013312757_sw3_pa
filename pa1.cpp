@@ -35,7 +35,7 @@ int main(int argc, char* argv[]){
 		resource_type = line1.substr(0,line1.find('	'));
 		resource_name = line1.substr(line1.find('	')+1,line1.length());
 		if(resource_type == "Book"){
-			lib.b_set(resource_name);
+			lib.b_set(resource_type, resource_name);
 		}
 	}
 	fin1.close();

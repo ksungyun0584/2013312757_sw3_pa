@@ -14,12 +14,16 @@ class resource {
 		int s_date = 0;
 		int e_date = 0;
 
+		int size = 0;
+
 	public:
 		void set(string n, string st, int s_d, int e_d);
 		string pname();
 		string pstate();
+		void ssize(int s);
 		int psd();
 		int ped();
+		int psi();
 };
 
 class book:public resource{};
@@ -31,6 +35,10 @@ void resource :: set(string n, string st, int s_d, int e_d){
 	state = st;
 	s_date = s_d;
 	e_date = e_d;
+}
+
+void resource :: ssize(int s){
+	size = s;
 }
 
 int transdate(string d){
@@ -55,6 +63,10 @@ int resource :: psd(){
 
 int resource :: ped(){
 	return e_date;
+}
+
+int resource :: psi(){
+	return size;
 }
 
 void pday(int day){
