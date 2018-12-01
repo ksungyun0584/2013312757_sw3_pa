@@ -23,7 +23,7 @@ class library {
 		void set(int n);
 		void u_set(string u);
 		void b_set(string n);
-		int operation(string d, string rt, string rn, string st, string mt, string mn);
+		int operation(string d, string rt, string rn, string op, string mt, string mn);
 		void description(int code);
 		int soperation(string d, string st, string sn, string op, string mt, string mn, string mnum, string t);
 };
@@ -57,6 +57,39 @@ int library :: soperation(string d, string st, string sn, string op, string mt, 
 	if(mnum != ""){
 		memnum = stoi(mnum);
 	}
+
+	try{
+		int i;
+		if(transdate(d)<3631)
+			throw 1;
+		if(st != "StudyRoom" && st != "Seat")
+			throw 2;
+		if(op != "B" && op != "R" && op != "E" && op != "C")
+			throw 3;
+		if(mt != "Undergraduate" && mt != "Graduate" && mt != "faculty")
+			throw 4;
+		for(i=0;i<mn.length();i++){
+			if(mn.at(i)=='0' || mn.at(i)=='1' || mn.at(i)=='2' || mn.at(i)=='3' || mn.at(i)=='4' || mn.at(i)=='5' || mn.at(i)=='6' || mn.at(i)=='7' || mn.at(i)=='8' || mn.at(i)=='9')
+			throw 5;		
+		}
+		if(tt < 0)
+			throw 6;
+	}
+	catch(int excp){
+		if(excp == 1)
+			return -1;
+		if(excp == 2)
+			return -2;
+		if(excp == 3)
+			return -3;
+		if(excp == 4)
+			return -4;
+		if(excp == 5)
+			return -5;
+		if(excp == 6)
+			return -6;
+	}
+
 	if (mt == "Undergraduate"){
 		for(i=0;i<u_num;i++){
 			m_num = u_num;
@@ -234,13 +267,38 @@ void library :: u_set(string u){
 	u_num++;
 }
 
-int library :: operation(string d, string rt, string rn, string st, string mt, string mn){
+int library :: operation(string d, string rt, string rn, string op, string mt, string mn){
 	date = transdate(d);
 	class book b;
 	int i;
 	int rnum=0;
 	int mnum=0;
 	int mrnum=0;
+
+	try{
+		int i;
+		if(transdate(d)<3631)
+			throw 1;
+		if(op != "B" & op != "R")
+			throw 3;
+		if(mt != "Undergraduate" & mt != "Graduate" & mt != "faculty")
+			throw 4;
+		for(i=0;i<mn.length();i++){
+			if(mn.at(i)=='0' || mn.at(i)=='1' || mn.at(i)=='2' || mn.at(i)=='3' || mn.at(i)=='4' || mn.at(i)=='5' || mn.at(i)=='6' || mn.at(i)=='7' || mn.at(i)=='8' || mn.at(i)=='9')
+				throw 5;		
+		}
+	}
+	catch(int excp){
+		if(excp == 1)
+			return -1;
+		if(excp == 3)
+			return -3;
+		if(excp == 4)
+			return -4;
+		if(excp == 5)
+			return -5;
+	}
+
 	if (rt == "Book"){
 		for(i=0;i<b_num;i++){
 			rnum = b_num;
@@ -264,7 +322,7 @@ int library :: operation(string d, string rt, string rn, string st, string mt, s
 		b = undergraduates.at(mnum).searchbook(rn);
 	}
 	
-	if(st == "B"){
+	if(op == "B"){
 		if(rnum == b_num){
 			date = 0;
 			return 1;
@@ -293,7 +351,7 @@ int library :: operation(string d, string rt, string rn, string st, string mt, s
 			return 0;
 		}
 	}
-	if(st == "R"){
+	if(op == "R"){
 		if(b.pstate() == "n"){
 			date = 0;
 			return 3;
@@ -315,7 +373,10 @@ int library :: operation(string d, string rt, string rn, string st, string mt, s
 }
 
 void library :: description(int code){
-	cout << code << '	';
+	if(code < 0)
+		cout << "-1" << '	';
+	else
+		cout << code << '	';
 	switch (code){
 		case 0: cout << "Success." << endl; break;
 		case 1: cout << "Non exist resource." << endl; break;
@@ -342,5 +403,12 @@ void library :: description(int code){
 		case 12: cout << "Exceed available number." << endl; break;
 		case 13: cout << "Exceed available time." << endl; break;
 		case 14: cout << "There is no remain space. This space is available after "; phour(hour%24); break;
+
+		case -1: cout << "Date out of range" << endl; break;
+		case -2: cout << "Non-exist space type" << endl; break;
+		case -3: cout << "Non-exist operation" << endl; break;
+		case -4: cout << "Non-exist member type" << endl; break;
+		case -5: cout << "Member name with numbers" << endl; break;
+		case -6: cout << "Negative time" << endl; break;
 	}
 }
