@@ -93,13 +93,13 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 		int i;
 		if(transdate(d)<3631)
 			throw 1;
-		if(op != "B" || op != "R")
+		if(op != "B" & op != "R")
 			throw 3;
-		if(mt != "Undergraduate" || mt != "Graduate" || mt != "faculty")
+		if(mt != "Undergraduate" & mt != "Graduate" & mt != "faculty")
 			throw 4;
 		for(i=0;i<mn.length();i++){
-			if(mn.at(i)>57 || mn.at(i)<48)
-			throw 5;		
+			if(mn.at(i)=='0' || mn.at(i)=='1' || mn.at(i)=='2' || mn.at(i)=='3' || mn.at(i)=='4' || mn.at(i)=='5' || mn.at(i)=='6' || mn.at(i)=='7' || mn.at(i)=='8' || mn.at(i)=='9')
+				throw 5;		
 		}
 	}
 	catch(int excp){
