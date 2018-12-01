@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -13,13 +14,16 @@ class resource {
 		int num = 1;
 		int s_date = 0;
 		int e_date = 0;
+		int size=0;
 
 	public:
 		void set(string n, string st, int s_d, int e_d);
 		string pname();
 		string pstate();
+		void ssize(int s);
 		int psd();
 		int ped();
+		int psi();
 };
 
 class book:public resource{};
@@ -31,6 +35,10 @@ void resource :: set(string n, string st, int s_d, int e_d){
 	state = st;
 	s_date = s_d;
 	e_date = e_d;
+}
+
+void resource :: ssize(int s){
+	size = s;
 }
 
 int transdate(string d){
@@ -53,6 +61,11 @@ int resource :: ped(){
 	return e_date;
 }
 
+int resource :: psi(){
+	return size;
+}
+
+
 void pday(int day){
 	int y,m,d;
 	y = day/360;
@@ -65,4 +78,10 @@ void pday(int day){
 	int d1 = d/10;
 	int d2 = d%10;
 	cout << y1 << y2 << '/' << m1 << m2 << '/' << d1 << d2 << endl;
+}
+
+void phour(int hour){
+	int h1 = hour/10;
+	int h2 = hour%10;
+	cout << h1 << h2 << "." << endl;
 }

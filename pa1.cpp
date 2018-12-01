@@ -20,9 +20,7 @@ int main(int argc, char* argv[]){
 	while(getline(fin,line)){
 		resource_type = line.substr(0,line.find('	'));
 		resource_name = line.substr(line.find('	')+1,line.length());
-		if(resource_type == "Book"){
-			lib.b_set(resource_name);
-		}
+		lib.b_set(resource_type, resource_name);
 	}
 	fin.close();
 
