@@ -660,6 +660,9 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 				rnum = i;
 				break;
 			}
+			if(rn == lmagazines.at(i).pname() && day != lmagazines.at(i).psi()) {
+				rnum = m_num+1;
+			}
 		}
 	}
 	else if (rt == "E-book"){
@@ -998,31 +1001,41 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					undergraduates.at(mnum).set(mn,date - lbooks.at(rnum).ped() + date);
 					date = undergraduates.at(mnum).ppenalty();
 					lbooks.at(rnum).set(rn,"R",0,0);
-					undergraduates.at(mnum).returnbook(rt, rn);
+					undergraduates.at(mnum).returnbook(rt, rn, day);
 					return 7;
 				}
 				else {
 					lbooks.at(rnum).set(rn,"R",0,0);
-					undergraduates.at(mnum).returnbook(rt, rn);
+					undergraduates.at(mnum).returnbook(rt, rn, day);
 					date = 0;
 					return 0;
 				}
 			}
 			else if(rt == "Magazine"){
-				if(m.pstate() == "n"){
+				if(day > date){
+					date = 0;
+					return 1;
+				}
+				else if(m.pstate() == "n"){
 					date = 0;
 					return 3;
+				}
+				else if(rnum==m_num+1 && date > day+330){
+					undergraduates.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
+					date = undergraduates.at(mnum).ppenalty();
+					undergraduates.at(mnum).returnbook(rt, rn, day);
+					return 7;
 				}
 		 		else if(date > lmagazines.at(rnum).ped()){
 					undergraduates.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
 					date = undergraduates.at(mnum).ppenalty();
 					lmagazines.at(rnum).set(rn,"R",0,0);
-					undergraduates.at(mnum).returnbook(rt, rn);
+					undergraduates.at(mnum).returnbook(rt, rn, day);
 					return 7;
 				}
 				else {
 					lmagazines.at(rnum).set(rn,"R",0,0);
-					undergraduates.at(mnum).returnbook(rt, rn);
+					undergraduates.at(mnum).returnbook(rt, rn, day);
 					date = 0;
 					return 0;
 				}
@@ -1034,7 +1047,7 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 				}
 				else {
 					le_books.at(rnum).set(rn,"R",0,0);
-					undergraduates.at(mnum).returnbook(rt, rn);
+					undergraduates.at(mnum).returnbook(rt, rn, day);
 					date = 0;
 					return 0;
 				}
@@ -1050,31 +1063,41 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					graduates.at(mnum).set(mn,date - lbooks.at(rnum).ped() + date);
 					date = graduates.at(mnum).ppenalty();
 					lbooks.at(rnum).set(rn,"R",0,0);
-					graduates.at(mnum).returnbook(rt, rn);
+					graduates.at(mnum).returnbook(rt, rn, day);
 					return 7;
 				}
 				else {
 					lbooks.at(rnum).set(rn,"R",0,0);
-					graduates.at(mnum).returnbook(rt, rn);
+					graduates.at(mnum).returnbook(rt, rn, day);
 					date = 0;
 					return 0;
 				}
 			}
 			else if(rt == "Magazine"){
-				if(m.pstate() == "n"){
+				if(day > date){
+					date = 0;
+					return 1;
+				}
+				else if(m.pstate() == "n"){
 					date = 0;
 					return 3;
+				}
+				else if(rnum==m_num+1 && date > day+330){
+					undergraduates.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
+					date = undergraduates.at(mnum).ppenalty();
+					undergraduates.at(mnum).returnbook(rt, rn, day);
+					return 7;
 				}
 		 		else if(date > lmagazines.at(rnum).ped()){
 					graduates.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
 					date = graduates.at(mnum).ppenalty();
 					lmagazines.at(rnum).set(rn,"R",0,0);
-					graduates.at(mnum).returnbook(rt, rn);
+					graduates.at(mnum).returnbook(rt, rn, day);
 					return 7;
 				}
 				else {
 					lmagazines.at(rnum).set(rn,"R",0,0);
-					graduates.at(mnum).returnbook(rt, rn);
+					graduates.at(mnum).returnbook(rt, rn, day);
 					date = 0;
 					return 0;
 				}
@@ -1086,7 +1109,7 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 				}
 				else {
 					le_books.at(rnum).set(rn,"R",0,0);
-					graduates.at(mnum).returnbook(rt, rn);
+					graduates.at(mnum).returnbook(rt, rn, day);
 					date = 0;
 					return 0;
 				}
@@ -1102,31 +1125,41 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					facultys.at(mnum).set(mn,date - lbooks.at(rnum).ped() + date);
 					date = facultys.at(mnum).ppenalty();
 					lbooks.at(rnum).set(rn,"R",0,0);
-					facultys.at(mnum).returnbook(rt, rn);
+					facultys.at(mnum).returnbook(rt, rn, day);
 					return 7;
 				}
 				else {
 					lbooks.at(rnum).set(rn,"R",0,0);
-					facultys.at(mnum).returnbook(rt, rn);
+					facultys.at(mnum).returnbook(rt, rn, day);
 					date = 0;
 					return 0;
 				}
 			}
 			else if(rt == "Magazine"){
-				if(m.pstate() == "n"){
+				if(day > date){
+					date = 0;
+					return 1;
+				}
+				else if(m.pstate() == "n"){
 					date = 0;
 					return 3;
+				}
+				else if(rnum==m_num+1 && date > day+330){
+					undergraduates.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
+					date = undergraduates.at(mnum).ppenalty();
+					undergraduates.at(mnum).returnbook(rt, rn, day);
+					return 7;
 				}
 		 		else if(date > lmagazines.at(rnum).ped()){
 					facultys.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
 					date = facultys.at(mnum).ppenalty();
 					lmagazines.at(rnum).set(rn,"R",0,0);
-					facultys.at(mnum).returnbook(rt, rn);
+					facultys.at(mnum).returnbook(rt, rn, day);
 					return 7;
 				}
 				else {
 					lmagazines.at(rnum).set(rn,"R",0,0);
-					facultys.at(mnum).returnbook(rt, rn);
+					facultys.at(mnum).returnbook(rt, rn, day);
 					date = 0;
 					return 0;
 				}
@@ -1138,7 +1171,7 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 				}
 				else {
 					le_books.at(rnum).set(rn,"R",0,0);
-					facultys.at(mnum).returnbook(rt, rn);
+					facultys.at(mnum).returnbook(rt, rn, day);
 					date = 0;
 					return 0;
 				}

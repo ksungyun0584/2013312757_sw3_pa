@@ -27,7 +27,7 @@ class member {
 		book searchbook(string s);
 		magazine searchmagazine(string s);
 		e_book searchebook(string s);
-		void returnbook(string t, string n);
+		void returnbook(string t, string n, int day);
 		void sca(int c);
 
 		void st_set(int sn, int t);
@@ -164,7 +164,7 @@ void member :: b_set(string t, string n, int sd, int ed){
 	}
 }
 
-void member :: returnbook(string t, string n){
+void member :: returnbook(string t, string n, int day){
 	int i;
 	if(t == "Book"){
 		class book b;
@@ -192,7 +192,7 @@ void member :: returnbook(string t, string n){
 			return;
 		}
 		for(i=0;i<m_num-1;i++){
-			if(magazines.at(i).pname() == n) {
+			if(magazines.at(i).pname() == n && magazines.at(i).psi() == day) {
 				m = magazines.at(i);
 				magazines.at(i) = magazines.at(i+1);
 				magazines.at(i+1) = m;
