@@ -20,12 +20,12 @@ class member {
 
 	public:
 		void set(string n, int p);
-		void b_set(string t, string n, int sd, int ed);
+		void b_set(string t, string n, int sd, int ed, int day);
 		string pname();
 		int pbnum(string t);
 		int ppenalty();
 		book searchbook(string s);
-		magazine searchmagazine(string s);
+		magazine searchmagazine(string s, int day);
 		e_book searchebook(string s);
 		void returnbook(string t, string n, int day);
 		void sca(int c);
@@ -39,6 +39,8 @@ class member {
 		int pt(string st);
 		int pet();
 		int pca();
+		int met(string n, int d);
+		int check(int date);
 };
 
 class undergraduate:public member{};
@@ -54,11 +56,11 @@ book member :: searchbook(string s){
 	return b;
 }
 
-magazine member :: searchmagazine(string s){
+magazine member :: searchmagazine(string s, int day){
 	class magazine m;
 	m.set("n","n",0,0);
 	for (int i=0;i<m_num;i++){
-		if(s == magazines.at(i).pname()) return magazines.at(i);
+		if(s == magazines.at(i).pname() && day==magazines.at(i).psi()) return magazines.at(i);
 	}
 	return m;
 }
@@ -72,6 +74,23 @@ e_book member :: searchebook(string s){
 	return e;
 }
 
+int member :: check(int date){
+	int i=0;
+	for(i=0;i<b_num;i++){
+		if(date > books.at(i).ped())
+			return -1;
+	}
+	for(i=0;i<m_num;i++){
+		if(date > magazines.at(i).ped())
+			return -1;
+	}
+	for(i=0;i<e_num;i++){
+		if(date > e_books.at(i).ped())
+			return -1;
+	}
+	return 0;
+}
+
 void member :: eset(int et){
 	etime = et;
 }
@@ -80,6 +99,14 @@ int member :: pet(){
 	return etime;
 }
 
+int member :: met(string n, int d){
+	for(int i=0;i<m_num;i++){
+		if(magazines.at(i).pname() == n && magazines.at(i).psi() == d){
+			return magazines.at(i).ped();
+		}
+	}
+	return -1;
+}
 int member :: pca(){
 	return capacity;
 }
@@ -137,7 +164,7 @@ void member :: set(string n, int p){
 	mname = n;
 }
 
-void member :: b_set(string t, string n, int sd, int ed){
+void member :: b_set(string t, string n, int sd, int ed, int day){
 	if(t == "Book"){
 		class book b;
 		b.set(n,"B",sd,ed);
@@ -147,12 +174,10 @@ void member :: b_set(string t, string n, int sd, int ed){
 	}
 	if(t == "Magazine"){
 		class magazine m;
-		for(int i=0;i<12;i++){
-			m.set(n,"B",sd,ed);
-			m.ssize((i+1)*30);
-			magazines.push_back(m);
-			m_num++;
-		}
+		m.set(n,"B",sd,ed);
+		m.ssize(day);
+		magazines.push_back(m);
+		m_num++;
 		return;
 	}
 	if(t == "E-book"){

@@ -71,7 +71,7 @@ int library :: soperation(string d, string st, string sn, string op, string mt, 
 			throw 2;
 		if(op != "B" && op != "R" && op != "E" && op != "C")
 			throw 3;
-		if(mt != "Undergraduate" && mt != "Graduate" && mt != "faculty")
+		if(mt != "Undergraduate" && mt != "Graduate" && mt != "Faculty")
 			throw 4;
 		for(i=0;i<mn.length();i++){
 			if(mn.at(i)=='0' || mn.at(i)=='1' || mn.at(i)=='2' || mn.at(i)=='3' || mn.at(i)=='4' || mn.at(i)=='5' || mn.at(i)=='6' || mn.at(i)=='7' || mn.at(i)=='8' || mn.at(i)=='9')
@@ -556,10 +556,10 @@ void library :: b_set(string t, string n){
 		b_num++;
 	}
 	if(t == "Magazine"){
-		class magazine m;
 		for(int i=0;i<12;i++){
+			class magazine m;
 			m.set(n,"R",0,0);
-			m.ssize((i+1)*30);
+			m.ssize(i*30);
 			lmagazines.push_back(m);
 			m_num++;
 		}
@@ -608,14 +608,13 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 	int mnum=0;
 	int mrnum=0;
 	int day=0;
-
 	try{
 		int i;
 		if(transdate(d)<3631)
 			throw 1;
-		if(op != "B" & op != "R")
+		if(op != "B" && op != "R")
 			throw 3;
-		if(mt != "Undergraduate" & mt != "Graduate" & mt != "faculty")
+		if(mt != "Undergraduate" & mt != "Graduate" & mt != "Faculty")
 			throw 4;
 		for(i=0;i<mn.length();i++){
 			if(mn.at(i)=='0' || mn.at(i)=='1' || mn.at(i)=='2' || mn.at(i)=='3' || mn.at(i)=='4' || mn.at(i)=='5' || mn.at(i)=='6' || mn.at(i)=='7' || mn.at(i)=='8' || mn.at(i)=='9')
@@ -647,11 +646,13 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 		int j=0;
 		month = rn.substr(rn.find('[')+1,rn.find(']'));
 		rn = rn.substr(0,rn.find('['));
-		day = (month.at(0)*10+month.at(1))*360+(month.at(3)*10+month.at(4))*30;
+		day = ((month.at(0)-48)*10+month.at(1)-48)*360+((month.at(3)-48)*10+month.at(4)-48)*30;
 		for(i=0;i<m_num;i++){
-			if(lmagazines.at(i).psi()<day-330){
-				lmagazines.at(i).ssize(day-lmagazines.at(i).psi()-300);
-				lmagazines.at(i).set(rn,"R",0,0);
+			if(lmagazines.at(i).psi()<date-360){
+				string name;
+				name = lmagazines.at(i).pname();
+				lmagazines.at(i).ssize(date-((d.at(6)-48)*10+d.at(7)-48)-lmagazines.at(i).psi()%360);
+				lmagazines.at(i).set(name,"R",0,0);
 			}
 		}
 		for(i=0;i<m_num;i++){
@@ -659,9 +660,6 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 			if(rn == lmagazines.at(i).pname() && day == lmagazines.at(i).psi()) {
 				rnum = i;
 				break;
-			}
-			if(rn == lmagazines.at(i).pname() && day != lmagazines.at(i).psi()) {
-				rnum = m_num+1;
 			}
 		}
 	}
@@ -689,7 +687,7 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 		if(rt == "Book")
 			b = undergraduates.at(mnum).searchbook(rn);
 		else if(rt == "Magazine")
-			m = undergraduates.at(mnum).searchmagazine(rn);
+			m = undergraduates.at(mnum).searchmagazine(rn, day);
 		else if(rt == "E-book")
 			e = undergraduates.at(mnum).searchebook(rn);
 	}
@@ -707,7 +705,7 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 		if(rt == "Book")
 			b = graduates.at(mnum).searchbook(rn);
 		else if(rt == "Magazine")
-			m = graduates.at(mnum).searchmagazine(rn);
+			m = graduates.at(mnum).searchmagazine(rn, day);
 		else if(rt == "E-book")
 			e = graduates.at(mnum).searchebook(rn);
 	}
@@ -725,7 +723,7 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 		if(rt == "Book")
 			b = facultys.at(mnum).searchbook(rn);
 		else if(rt == "Magazine")
-			m = facultys.at(mnum).searchmagazine(rn);
+			m = facultys.at(mnum).searchmagazine(rn, day);
 		else if(rt == "E-book")
 			e = facultys.at(mnum).searchebook(rn);
 	}
@@ -738,7 +736,7 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					return 1;
 				}
 				else if(undergraduates.at(mnum).pbnum(rt) > MAX_borrow - 1){
-					date = 0;
+					date = 1;
 					return 2;	
 				}
 				else if(b.pstate() == "B" && b.pname() == rn){
@@ -753,24 +751,28 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = undergraduates.at(mnum).ppenalty();
 					return 6;
 				}
+				else if(undergraduates.at(mnum).check(date) == -1){
+					date = 0;
+					return 16;
+				}
 				else {
 					lbooks.at(rnum).set(rn,"B",date,date+13);
 					undergraduates.at(mnum).set(mn,0);
-					undergraduates.at(mnum).b_set(rt,rn,date,date+13);
+					undergraduates.at(mnum).b_set(rt,rn,date,date+13, day);
 					date = 0;
 					return 0;
 				}
 			}
 			else if(rt == "Magazine"){
-				if(rnum == m_num || date > day+330 || day > date){
+				if(rnum == m_num || date > day+360 || day > date){
 					date = 0;
 					return 1;
 				}
 				else if(undergraduates.at(mnum).pbnum(rt) > MAX_borrow - 1){
-					date = 0;
+					date = 1;
 					return 2;	
 				}
-				else if(m.pstate() == "B" && m.pname() == rn){
+				else if(m.pstate() == "B" && m.pname() == rn && day == m.psi()){
 					date = m.psd();
 					return 4;
 				}
@@ -782,10 +784,14 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = undergraduates.at(mnum).ppenalty();
 					return 6;
 				}
+				else if(undergraduates.at(mnum).check(date) == -1){
+					date = 0;
+					return 16;
+				}
 				else {
 					lmagazines.at(rnum).set(rn,"B",date,date+13);
 					undergraduates.at(mnum).set(mn,0);
-					undergraduates.at(mnum).b_set(rt,rn,date,date+13);
+					undergraduates.at(mnum).b_set(rt,rn,date,date+13, day);
 					date = 0;
 					return 0;
 				}
@@ -807,11 +813,15 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = 0;
 					return 15;
 				}
+				else if(undergraduates.at(mnum).check(date) == -1){
+					date = 0;
+					return 16;
+				}
 				else {
 					undergraduates.at(mnum).sca(undergraduates.at(mnum).pca()+le_books.at(rnum).psi());
 					le_books.at(rnum).set(rn,"B",date,date+13);
 					undergraduates.at(mnum).set(mn,0);
-					undergraduates.at(mnum).b_set(rt,rn,date,date+13);
+					undergraduates.at(mnum).b_set(rt,rn,date,date+13, day);
 					date = 0;
 					return 0;
 				}
@@ -824,7 +834,7 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					return 1;
 				}
 				else if(graduates.at(mnum).pbnum(rt) > MAX_borrow+4 - 1){
-					date = 0;
+					date = 5;
 					return 2;	
 				}
 				else if(b.pstate() == "B" && b.pname() == rn){
@@ -839,24 +849,29 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = graduates.at(mnum).ppenalty();
 					return 6;
 				}
+				else if(graduates.at(mnum).check(date) == -1){
+					date = 0;
+					return 16;
+				}
 				else {
 					lbooks.at(rnum).set(rn,"B",date,date+29);
 					graduates.at(mnum).set(mn,0);
-					graduates.at(mnum).b_set(rt,rn,date,date+29);
+					graduates.at(mnum).b_set(rt,rn,date,date+29, day);
 					date = 0;
 					return 0;
 				}
 			}
 			else if(rt == "Magazine"){
-				if(rnum == m_num || date > day+330 || day > date){
+				if(rnum == m_num || date > day+360 || day > date){
 					date = 0;
 					return 1;
 				}
 				else if(graduates.at(mnum).pbnum(rt) > MAX_borrow+4 - 1){
-					date = 0;
+					cout << graduates.at(mnum).pbnum(rt)<< endl;
+					date = 5;
 					return 2;	
 				}
-				else if(m.pstate() == "B" && m.pname() == rn){
+				else if(m.pstate() == "B" && m.pname() == rn && day == m.psi()){
 					date = m.psd();
 					return 4;
 				}
@@ -868,10 +883,14 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = graduates.at(mnum).ppenalty();
 					return 6;
 				}
+				else if(graduates.at(mnum).check(date) == -1){
+					date = 0;
+					return 16;
+				}
 				else {
 					lmagazines.at(rnum).set(rn,"B",date,date+29);
 					graduates.at(mnum).set(mn,0);
-					graduates.at(mnum).b_set(rt,rn,date,date+29);
+					graduates.at(mnum).b_set(rt,rn,date,date+29, day);
 					date = 0;
 					return 0;
 				}
@@ -893,11 +912,15 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = 0;
 					return 15;
 				}
+				else if(graduates.at(mnum).check(date) == -1){
+					date = 0;
+					return 16;
+				}
 				else {
 					graduates.at(mnum).sca(graduates.at(mnum).pca()+le_books.at(rnum).psi());
 					le_books.at(rnum).set(rn,"B",date,date+29);
 					graduates.at(mnum).set(mn,0);
-					graduates.at(mnum).b_set(rt,rn,date,date+29);
+					graduates.at(mnum).b_set(rt,rn,date,date+29, day);
 					date = 0;
 					return 0;
 				}
@@ -910,7 +933,7 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					return 1;
 				}
 				else if(facultys.at(mnum).pbnum(rt) > MAX_borrow+9 - 1){
-					date = 0;
+					date = 10;
 					return 2;	
 				}
 				else if(b.pstate() == "B" && b.pname() == rn){
@@ -925,24 +948,28 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = facultys.at(mnum).ppenalty();
 					return 6;
 				}
+				else if(facultys.at(mnum).check(date) == -1){
+					date = 0;
+					return 16;
+				}
 				else {
 					lbooks.at(rnum).set(rn,"B",date,date+29);
 					facultys.at(mnum).set(mn,0);
-					facultys.at(mnum).b_set(rt,rn,date,date+29);
+					facultys.at(mnum).b_set(rt,rn,date,date+29, day);
 					date = 0;
 					return 0;
 				}
 			}
 			else if(rt == "Magazine"){
-				if(rnum == m_num || date > day+330 || day > date){
+				if(rnum == m_num || date > day+360 || day > date){
 					date = 0;
 					return 1;
 				}
 				else if(facultys.at(mnum).pbnum(rt) > MAX_borrow+9 - 1){
-					date = 0;
+					date = 10;
 					return 2;	
 				}
-				else if(m.pstate() == "B" && m.pname() == rn){
+				else if(m.pstate() == "B" && m.pname() == rn && day == m.psi()){
 					date = m.psd();
 					return 4;
 				}
@@ -954,10 +981,14 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = facultys.at(mnum).ppenalty();
 					return 6;
 				}
+				else if(facultys.at(mnum).check(date) == -1){
+					date = 0;
+					return 16;
+				}
 				else {
 					lmagazines.at(rnum).set(rn,"B",date,date+29);
 					facultys.at(mnum).set(mn,0);
-					facultys.at(mnum).b_set(rt,rn,date,date+29);
+					facultys.at(mnum).b_set(rt,rn,date,date+29, day);
 					date = 0;
 					return 0;
 				}
@@ -979,11 +1010,15 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = 0;
 					return 15;
 				}
+				else if(facultys.at(mnum).check(date) == -1){
+					date = 0;
+					return 16;
+				}
 				else {
 					facultys.at(mnum).sca(facultys.at(mnum).pca()+le_books.at(rnum).psi());
 					le_books.at(rnum).set(rn,"B",date,date+29);
 					facultys.at(mnum).set(mn,0);
-					facultys.at(mnum).b_set(rt,rn,date,date+29);
+					facultys.at(mnum).b_set(rt,rn,date,date+29, day);
 					date = 0;
 					return 0;
 				}
@@ -1020,11 +1055,18 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = 0;
 					return 3;
 				}
-				else if(rnum==m_num+1 && date > day+330){
-					undergraduates.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
-					date = undergraduates.at(mnum).ppenalty();
-					undergraduates.at(mnum).returnbook(rt, rn, day);
-					return 7;
+				else if(rnum==u_num && date > day+330){
+					if(date > undergraduates.at(mnum).met(rn, day)){
+						undergraduates.at(mnum).set(mn,date - undergraduates.at(mnum).met(rn, day) + date);
+						date = undergraduates.at(mnum).ppenalty();
+						undergraduates.at(mnum).returnbook(rt, rn, day);
+						return 7;
+					}
+					else {
+						graduates.at(mnum).returnbook(rt, rn, day);
+						date = 0;
+						return 0;
+					}
 				}
 		 		else if(date > lmagazines.at(rnum).ped()){
 					undergraduates.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
@@ -1082,11 +1124,18 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = 0;
 					return 3;
 				}
-				else if(rnum==m_num+1 && date > day+330){
-					undergraduates.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
-					date = undergraduates.at(mnum).ppenalty();
-					undergraduates.at(mnum).returnbook(rt, rn, day);
-					return 7;
+				else if(rnum==m_num && date > day+330){
+					if(date > graduates.at(mnum).met(rn, day)){
+						graduates.at(mnum).set(mn,date - graduates.at(mnum).met(rn, day) + date);
+						date = graduates.at(mnum).ppenalty();
+						graduates.at(mnum).returnbook(rt, rn, day);
+						return 7;
+					}
+					else {
+						graduates.at(mnum).returnbook(rt, rn, day);
+						date = 0;
+						return 0;
+					}
 				}
 		 		else if(date > lmagazines.at(rnum).ped()){
 					graduates.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
@@ -1144,11 +1193,18 @@ int library :: operation(string d, string rt, string rn, string op, string mt, s
 					date = 0;
 					return 3;
 				}
-				else if(rnum==m_num+1 && date > day+330){
-					undergraduates.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
-					date = undergraduates.at(mnum).ppenalty();
-					undergraduates.at(mnum).returnbook(rt, rn, day);
-					return 7;
+				else if(rnum==m_num && date > day+330){
+					if(date > facultys.at(mnum).met(rn, day)){
+						facultys.at(mnum).set(mn,date - facultys.at(mnum).met(rn, day) + date);
+						date = facultys.at(mnum).ppenalty();
+						facultys.at(mnum).returnbook(rt, rn, day);
+						return 7;
+					}
+					else {
+						facultys.at(mnum).returnbook(rt, rn, day);
+						date = 0;
+						return 0;
+					}
 				}
 		 		else if(date > lmagazines.at(rnum).ped()){
 					facultys.at(mnum).set(mn,date - lmagazines.at(rnum).ped() + date);
@@ -1187,7 +1243,7 @@ void library :: description(int code){
 	switch (code){
 		case 0: cout << "Success." << endl; break;
 		case 1: cout << "Non exist resource." << endl; break;
-		case 2: cout << "Exceeds your possible number of borrow. Possible # of borrows: " << MAX_borrow << endl; break;
+		case 2: cout << "Exceeds your possible number of borrow. Possible # of borrows: " << date << endl; break;
 		case 3: cout <<  "You did not borrow this book." << endl; break;
 		case 4: cout << "You already borrowed this book at "; pday(date); break;
 		case 5: cout << "Other member already borrowed this book. This book will be returned at "; pday(date); break;
@@ -1210,7 +1266,8 @@ void library :: description(int code){
 		case 12: cout << "Exceed available number." << endl; break;
 		case 13: cout << "Exceed available time." << endl; break;
 		case 14: cout << "There is no remain space. This space is available after "; phour(hour%24); break;
-
+		case 15: cout << "Exceeds your storage capacity." << endl; break;
+		case 16: cout << "Previously borrowed books are overdue, so borrow is limited." << endl; break;
 		case -1: cout << "Date out of range" << endl; break;
 		case -2: cout << "Non-exist space type" << endl; break;
 		case -3: cout << "Non-exist operation" << endl; break;
